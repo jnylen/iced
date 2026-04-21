@@ -224,6 +224,55 @@ impl Radius {
     }
 }
 
+impl<T> From<[T; 2]> for Radius
+where
+    T: Into<Pixels> + Copy,
+{
+    fn from([top_left_and_bottom_right, top_right_and_bottom_left]: [T; 2]) -> Self {
+        let top_left_and_bottom_right = top_left_and_bottom_right.into().0;
+        let top_right_and_bottom_left = top_right_and_bottom_left.into().0;
+
+        Self {
+            top_left: top_left_and_bottom_right,
+            top_right: top_right_and_bottom_left,
+            bottom_right: top_left_and_bottom_right,
+            bottom_left: top_right_and_bottom_left,
+        }
+    }
+}
+
+impl<T> From<[T; 3]> for Radius
+where
+    T: Into<Pixels> + Copy,
+{
+    fn from([top_left, top_right_and_bottom_left, bottom_right]: [T; 3]) -> Self {
+        let top_left = top_left.into().0;
+        let top_right_and_bottom_left = top_right_and_bottom_left.into().0;
+        let bottom_right = bottom_right.into().0;
+
+        Self {
+            top_left,
+            top_right: top_right_and_bottom_left,
+            bottom_right,
+            bottom_left: top_right_and_bottom_left,
+        }
+    }
+}
+
+impl<T> From<[T; 4]> for Radius
+where
+    T: Into<Pixels> + Copy,
+{
+    fn from([top_left, top_right, bottom_right, bottom_left]: [T; 4]) -> Self {
+        Self {
+            top_left: top_left.into().0,
+            top_right: top_right.into().0,
+            bottom_right: bottom_right.into().0,
+            bottom_left: bottom_left.into().0,
+        }
+    }
+}
+
 impl From<f32> for Radius {
     fn from(radius: f32) -> Self {
         Self {
@@ -274,5 +323,49 @@ impl std::ops::Mul<f32> for Radius {
             bottom_right: self.bottom_right * scale,
             bottom_left: self.bottom_left * scale,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Radius;
+
+    #[test]
+    fn css_shorthand_two_values() {
+        assert_eq!(
+            Radius::from([10_u32, 20]),
+            Radius {
+                top_left: 10.0,
+                top_right: 20.0,
+                bottom_right: 10.0,
+                bottom_left: 20.0,
+            }
+        );
+    }
+
+    #[test]
+    fn css_shorthand_three_values() {
+        assert_eq!(
+            Radius::from([10_u32, 20, 30]),
+            Radius {
+                top_left: 10.0,
+                top_right: 20.0,
+                bottom_right: 30.0,
+                bottom_left: 20.0,
+            }
+        );
+    }
+
+    #[test]
+    fn css_shorthand_four_values() {
+        assert_eq!(
+            Radius::from([10_u32, 20, 30, 40]),
+            Radius {
+                top_left: 10.0,
+                top_right: 20.0,
+                bottom_right: 30.0,
+                bottom_left: 40.0,
+            }
+        );
     }
 }

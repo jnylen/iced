@@ -15,6 +15,7 @@ pub struct Viewer<Handle> {
     padding: f32,
     width: Length,
     height: Length,
+    border_radius: border::Radius,
     min_scale: f32,
     max_scale: f32,
     scale_step: f32,
@@ -31,6 +32,7 @@ impl<Handle> Viewer<Handle> {
             padding: 0.0,
             width: Length::Shrink,
             height: Length::Shrink,
+            border_radius: border::Radius::default(),
             min_scale: 0.25,
             max_scale: 10.0,
             scale_step: 0.10,
@@ -48,6 +50,15 @@ impl<Handle> Viewer<Handle> {
     /// Sets the [`ContentFit`] of the [`Viewer`].
     pub fn content_fit(mut self, content_fit: ContentFit) -> Self {
         self.content_fit = content_fit;
+        self
+    }
+
+    /// Sets the [`border::Radius`] of the [`Viewer`].
+    ///
+    /// The corners are ordered like CSS: top-left, top-right, bottom-right,
+    /// bottom-left.
+    pub fn border_radius(mut self, border_radius: impl Into<border::Radius>) -> Self {
+        self.border_radius = border_radius.into();
         self
     }
 
@@ -298,7 +309,7 @@ where
         _style: &renderer::Style,
         layout: Layout<'_>,
         _cursor: mouse::Cursor,
-        viewport: &Rectangle,
+        _viewport: &Rectangle,
     ) {
         let state = tree.state.downcast_ref::<State>();
         let bounds = layout.bounds();
@@ -330,13 +341,13 @@ where
                 renderer.draw_image(
                     Image {
                         handle: self.handle.clone(),
-                        border_radius: border::Radius::default(),
+                        border_radius: self.border_radius,
                         filter_method: self.filter_method,
                         rotation: Radians(0.0),
                         opacity: 1.0,
                     },
                     drawing_bounds,
-                    *viewport - translation,
+                    bounds - translation,
                 );
             });
         };

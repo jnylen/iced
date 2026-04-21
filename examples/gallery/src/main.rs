@@ -533,8 +533,7 @@ impl Viewer {
 
         let image = self.image.as_ref().map(|allocation| {
             image(allocation.handle())
-                .width(Fill)
-                .height(Fill)
+                .border_radius(BORDER_RADIUS)
                 .opacity(self.image_fade_in.interpolate(0.0, 1.0, now))
                 .scale(self.image_fade_in.interpolate(1.5, 1.0, now))
         });

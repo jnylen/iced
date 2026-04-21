@@ -525,12 +525,25 @@ impl Engine {
             } => {
                 let physical_bounds = *local_clip_bounds * _transformation;
 
-                let Some(clip_bounds) = physical_bounds.intersection(&_clip_bounds) else {
+                let Some(_) = physical_bounds.intersection(&_clip_bounds) else {
                     return;
                 };
 
-                // TODO: Border radius
-                adjust_clip_mask(_clip_mask, clip_bounds);
+                let mut border_radius = <[f32; 4]>::from(image.border_radius);
+
+                for radius in &mut border_radius {
+                    *radius = (*radius)
+                        .min(local_clip_bounds.width / 2.0)
+                        .min(local_clip_bounds.height / 2.0);
+                }
+
+                adjust_clip_mask(_clip_mask, _clip_bounds);
+                _clip_mask.intersect_path(
+                    &rounded_rectangle(*local_clip_bounds, border_radius),
+                    tiny_skia::FillRule::EvenOdd,
+                    true,
+                    into_transform(_transformation),
+                );
 
                 let center = physical_bounds.center();
                 let radians = f32::from(image.rotation);

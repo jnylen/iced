@@ -169,8 +169,11 @@ impl<Handle> Image<Handle> {
 
     /// Sets the [`border::Radius`] of the [`Image`].
     ///
-    /// Currently, it will only be applied around the rectangular bounding box
-    /// of the [`Image`].
+    /// The corners are ordered like CSS: top-left, top-right, bottom-right,
+    /// bottom-left.
+    ///
+    /// Currently, it will only be applied around the rectangular bounding box of
+    /// the [`Image`].
     pub fn border_radius(mut self, border_radius: impl Into<border::Radius>) -> Self {
         self.border_radius = border_radius.into();
         self
